@@ -26,12 +26,11 @@ jobs:
     - name: Compilar y Ejecutar Pruebas con Maven
       run: mvn clean test
 
-    # Análisis real en la nube conectando GitHub con SonarCloud
+    # Análisis real en la nube conectando GitHub con SonarCloud pasándole el token directamente a Maven
     - name: Analisis de Calidad con SonarCloud
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: |
         mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
-          -Dsonar.projectKeyLucasRamirez04_EV3_DevOps \
+          -Dsonar.projectKey=LucasRamirez04_EV3_DevOps \
           -Dsonar.organization=lucasramirez04 \
-          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
