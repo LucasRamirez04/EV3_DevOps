@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: springboot-app-container
-        image: tu-usuario-docker/springboot-app-devops:latest
+        image: lucramirezr04/springboot-app-devops:latest
         ports:
         - containerPort: 8080
         resources:
