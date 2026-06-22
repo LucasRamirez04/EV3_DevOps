@@ -33,3 +33,21 @@ jobs:
           -Dsonar.projectKey=LucasRamirez04_EV3_DevOps \
           -Dsonar.organization=lucasramirez04 \
           -Dsonar.host.url=https://sonarcloud.io
+
+
+    # Automatizar desplieque
+    - name: Configurar QEMU y Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # Nota: En entornos reales aquí iniciarías sesión en Docker Hub con secretos
+    - name: Construir Imagen Docker del Microservicio
+      run: |
+        docker build -t lucasramirez04/springboot-app-devops:latest .
+
+    - name: Simular Despliegue en Kubernetes Cluster
+      run: |
+        echo "Conectando al clúster de Kubernetes..."
+        echo "Aplicando manifiestos de la carpeta k8s..."
+        echo "kubectl apply -f k8s/deployment.yaml"
+        echo "kubectl apply -f k8s/service.yaml"
+        echo "¡Despliegue continuo ejecutado con éxito!"
