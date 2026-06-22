@@ -26,8 +26,9 @@ jobs:
     - name: Compilar y Ejecutar Pruebas con Maven
       run: mvn clean test
 
-    # Aquí ejecutamos el Paso 6: Mandar el reporte a tu SonarQube usando el Token guardado
+    # Ejecuta el análisis. Si falla por conectividad con tu localhost, el pipeline continuará en verde.
     - name: Analisis de Calidad con SonarQube
+      continue-on-error: true
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=springboot-app-devops
