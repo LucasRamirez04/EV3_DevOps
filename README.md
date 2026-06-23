@@ -1,31 +1,62 @@
-# EV3 DevOps - Taller de Integración Continua y Despliegue
+# Evaluación 3 - DevOps: Taller de Integración Continua y Despliegue 🚀
+**Autor:** Lucas  
+**Institución:** Duoc UC  
 
-Este repositorio contiene el pipeline de CI/CD y los manifiestos de infraestructura para el microservicio Spring Boot.
-
-## 🚀 1. Arquitectura y Despliegue en la Nube (IE2)
-El microservicio está completamente orquestado y desplegado en un entorno de producción utilizando **Kubernetes (Minikube)** montado sobre una instancia **AWS EC2 (t3.medium)**.
-
-Para verificar que las réplicas del microservicio están operativas, se adjunta la evidencia del estado de los Pods en el clúster:
-
-![Estado de los Pods de la Aplicación](./images/evidencia_pods.png)
-
+Este repositorio contiene la arquitectura completa de CI/CD, infraestructura como código y observabilidad para un microservicio desarrollado en **Spring Boot**. El objetivo de este proyecto es demostrar la automatización del ciclo de vida del software, desde la integración de código hasta su monitoreo en un entorno de producción simulado en la nube.
 
 ---
 
-## 📊 2. Monitoreo, Observabilidad y Dashboards (IE1 e IE3)
-Para cumplir con los requisitos de observabilidad, se implementó un stack de monitoreo utilizando **Prometheus** (recolección de métricas masivas) y **Grafana** (visualización).
-
-El dashboard analiza en tiempo real las cuotas de recursos asignadas al contenedor de Spring Boot. A continuación, se muestra el gráfico de rendimiento con métricas clave de **Uso de CPU** y **Memoria RAM (WSS)**:
-
-![Dashboard de Grafana](./images/evidencia_grafana.png)
-
+## 🏗️ 1. Arquitectura del Proyecto (Req. 1)
+El proyecto se estructura bajo un pipeline de entrega continua que conecta las siguientes tecnologías:
+* **Control de Versiones:** GitHub
+* **CI/CD:** GitHub Actions
+* **Análisis de Calidad Estática:** SonarCloud / SonarQube
+* **Contenerización y Registro:** Docker & Docker Hub
+* **Orquestación y Nube:** Kubernetes (Minikube) sobre una instancia AWS EC2 (t3.medium)
+* **Observabilidad:** Helm, Prometheus y Grafana
 
 ---
 
-## 🛡️ 3. Políticas de Cumplimiento y Calidad (IE5 e IE6)
-El pipeline en **GitHub Actions** valida la calidad del código mediante políticas estrictas antes de permitir cualquier empaquetado:
+## ⚙️ 2. Pipeline CI/CD Funcional (Req. 2)
+Se implementó un flujo de trabajo automatizado mediante GitHub Actions (`.github/workflows/pipeline.yml`). Cada vez que se realiza un *push* a la rama principal, el pipeline ejecuta de forma secuencial:
+1. Configuración del entorno Java 21.
+2. Compilación y testing con Maven.
+3. Escaneo de calidad y seguridad con SonarQube.
+4. Construcción de la imagen Docker.
+5. Push al registro público de Docker Hub (`latest`).
 
-1. **SonarQube Cloud:** Analiza la presencia de bugs, code smells y vulnerabilidades.
-2. **Control de Fallas Críticas (IE6):** El pipeline está diseñado de manera secuencial. Si una prueba unitaria falla o SonarCloud no aprueba las políticas de calidad, el flujo se detiene inmediatamente, bloqueando la construcción de la imagen Docker y evitando que el código defectuoso llegue a AWS.
+![Evidencia Pipeline Exitoso](./images/evidencia_pipeline.png)
+*(Nota: Reemplazar con la imagen del pipeline en verde en GitHub Actions)*
 
-![Pipeline Exitoso](./images/evidencia_pipeline.png)
+---
+
+## 🛡️ 3. Integración de SonarQube y Detención Automática (Req. 5 y Req. 7)
+Se integró **SonarCloud** para evaluar el cumplimiento de políticas de calidad, cobertura y seguridad (IE5). 
+
+El pipeline está diseñado bajo una **política de tolerancia cero a fallas críticas (IE6)**. Como se demuestra en la siguiente evidencia, cuando SonarQube detecta vulnerabilidades que reprueban el *Quality Gate* (Status: Failed), el pipeline de GitHub Actions arroja un error y **se detiene automáticamente**. Esto bloquea el proceso de empaquetado en Docker, garantizando que el código defectuoso jamás llegue al entorno de AWS.
+
+![Evidencia Falla SonarQube](./images/sonarqube-failed.png)
+*(Nota: Aquí va la imagen que muestra el Failed en SonarQube y la detención del pipeline)*
+
+---
+
+## ☁️ 4. Despliegue en Kubernetes (Req. 3)
+El microservicio contenerizado se despliega en un clúster de Kubernetes alojado en una instancia EC2 de AWS. 
+Se configuraron manifiestos YAML (`k8s/deployment.yaml` y `k8s/service.yaml`) para definir:
+* **Alta disponibilidad:** 2 réplicas exactas del pod corriendo simultáneamente.
+* **Gestión de recursos:** Cuotas estrictas de CPU y Memoria (Limits y Requests) para evitar la saturación del servidor.
+
+A continuación, se evidencia el estado operativo (`Running`) de los Pods dentro del servidor AWS:
+
+![Evidencia Pods en Kubernetes](./images/evidencia_pods.png)
+*(Nota: Reemplazar con la imagen de la terminal mostrando kubectl get pods)*
+
+---
+
+## 📊 5. Observabilidad: Prometheus, Grafana y Dashboards (Req. 4 y Req. 6)
+Para asegurar el monitoreo continuo, el stack de observabilidad no se configuró mediante manifiestos estáticos individuales, sino que se implementó de forma dinámica directamente en el clúster utilizando el gestor de paquetes **Helm**:
+
+```bash
+# Comandos utilizados para la configuración del monitoreo
+helm repo add prometheus-community [https://prometheus-community.github.io/helm-charts](https://prometheus-community.github.io/helm-charts)
+helm install stack-monitoreo prometheus-community/kube-prometheus-stack --timeout 15m
