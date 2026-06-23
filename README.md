@@ -24,7 +24,7 @@ Se implementó un flujo de trabajo automatizado mediante GitHub Actions (`.githu
 5. Push al registro público de Docker Hub (`latest`).
 
 ![Evidencia Pipeline Exitoso](./images/evidencia_pipeline.png)
-*(Nota: Reemplazar con la imagen del pipeline en verde en GitHub Actions)*
+
 
 ---
 
@@ -34,7 +34,7 @@ Se integró **SonarCloud** para evaluar el cumplimiento de políticas de calidad
 El pipeline está diseñado bajo una **política de tolerancia cero a fallas críticas (IE6)**. Como se demuestra en la siguiente evidencia, cuando SonarQube detecta vulnerabilidades que reprueban el *Quality Gate* (Status: Failed), el pipeline de GitHub Actions arroja un error y **se detiene automáticamente**. Esto bloquea el proceso de empaquetado en Docker, garantizando que el código defectuoso jamás llegue al entorno de AWS.
 
 ![Evidencia Falla SonarQube](./images/sonarqube-failed.png)
-*(Nota: Aquí va la imagen que muestra el Failed en SonarQube y la detención del pipeline)*
+
 
 ---
 
@@ -47,12 +47,13 @@ Se configuraron manifiestos YAML (`k8s/deployment.yaml` y `k8s/service.yaml`) pa
 A continuación, se evidencia el estado operativo (`Running`) de los Pods dentro del servidor AWS:
 
 ![Evidencia Pods en Kubernetes](./images/evidencia_pods.png)
-*(Nota: Reemplazar con la imagen de la terminal mostrando kubectl get pods)*
 
 ---
 
 ##  5. Observabilidad: Prometheus, Grafana y Dashboards 
 Para asegurar el monitoreo continuo, el stack de observabilidad no se configuró mediante manifiestos estáticos individuales, sino que se implementó de forma dinámica directamente en el clúster utilizando el gestor de paquetes **Helm**:
+
+![Evidencia Graficos Grafana](./images/evidencia_grafana.png)
 
 ```bash
 # Comandos utilizados para la configuración del monitoreo
